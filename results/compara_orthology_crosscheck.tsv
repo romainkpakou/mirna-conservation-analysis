@@ -1,0 +1,5 @@
+famille	ensembl_gene_id	target_species	homology_type	pct_identity_gene_level	taxonomy_level
+miR-208a-3p	ENSG00000199157	mus_musculus	ortholog_one2one	81.9277	Eutheria
+miR-208a-3p	ENSG00000199157	rattus_norvegicus	ortholog_one2one	42.2414	Eutheria
+miR-208a-3p	ENSG00000199157	danio_rerio	ortholog_one2one	57.5	Euteleostomi
+miR-208b-3p	ENSG00000215991	mus_musculus	ortholog_one2one	94.8052	Eutheria

@@ -42,8 +42,14 @@ miRBase sans modification du code.
 ```{r summary}
 read_tsv("../results/conservation_summary.tsv", show_col_types = FALSE) %>%
   kable(format = "html",
-        col.names = c("Famille", "Espèces (miRBase)", "Clades présents", "Identité moyenne vs humain (%)"))
+        col.names = c("Famille", "Espèces (miRBase)", "Clades présents",
+                       "Identité globale moyenne (%)", "Identité seed moyenne (%)"))
 ```
+
+La colonne "seed" (positions 2-8 de la séquence mature -- le segment le plus déterminant
+pour la reconnaissance des ARNm cibles) est systématiquement **plus conservée** que la
+séquence globale pour les 6 familles, cohérent avec une pression de sélection purificatrice
+plus forte sur la seed que sur le reste de la séquence mature.
 
 ```{r n-species-plot, fig.width=7, fig.height=4}
 read_tsv("../results/conservation_summary.tsv", show_col_types = FALSE) %>%
@@ -61,6 +67,23 @@ remontant à l'ancêtre commun des bilatériens, >600 millions d'années) ; *miR
 *miR-499a* sont restreints aux mammifères -- cohérent avec leur origine évolutive récente,
 nichés dans des gènes de myosine cardiaque apparus avec la complexification du système
 cardiovasculaire des vertébrés.
+
+## Conservation de la seed region vs séquence globale
+
+```{r seed-vs-global-plot, fig.width=7, fig.height=4}
+read_tsv("../results/conservation_summary.tsv", show_col_types = FALSE) %>%
+  select(famille, identite_moyenne, identite_seed_moyenne) %>%
+  pivot_longer(-famille, names_to = "mesure", values_to = "identite") %>%
+  mutate(mesure = recode(mesure, identite_moyenne = "Séquence globale", identite_seed_moyenne = "Seed (positions 2-8)")) %>%
+  ggplot(aes(x = famille, y = identite, fill = mesure)) +
+  geom_col(position = "dodge") +
+  coord_cartesian(ylim = c(85, 100)) +
+  scale_fill_manual(values = c("Séquence globale" = "#9e8966", "Seed (positions 2-8)" = "#4A7C7C")) +
+  labs(x = NULL, y = "Identité moyenne vs humain (%)", fill = NULL,
+       title = "La seed region est plus conservée que la séquence mature entière") +
+  theme_minimal(base_size = 12) +
+  theme(axis.text.x = element_text(angle = 20, hjust = 1))
+```
 
 ## Recommandation de modèle animal par miARN
 
@@ -88,14 +111,43 @@ n'est pas preuve d'absence).
 read_tsv("../results/conservation_miR-1-3p.tsv", show_col_types = FALSE) %>%
   arrange(desc(pct_identity_vs_human)) %>%
   slice_head(n = 15) %>%
+  select(species_code, species_full, clade, pct_identity_vs_human, pct_identity_seed_vs_human) %>%
   kable(format = "html",
-        col.names = c("Code espèce", "Espèce", "Clade", "Identité vs humain (%)", "Positions comparées"))
+        col.names = c("Code espèce", "Espèce", "Clade", "Identité globale (%)", "Identité seed (%)"))
 ```
 
 Note méthodologique : *miR-1* existe en deux copies génomiques chez l'humain
 (*MIR1-1*/*MIR1-2*) ; miRBase annote le produit mature sous un nom incluant le numéro de
 locus (`hsa-miR-1-2-3p`) plutôt que le nom de famille simple. Ce cas a été détecté et
 géré automatiquement par le pipeline (voir `scripts/00_extract_sequences.py`).
+
+## Croisement avec l'orthologie Ensembl Compara
+
+La conservation de séquence (ci-dessus) peut en principe refléter une similarité
+fortuite plutôt qu'une vraie orthologie. Pour les 3 miARN à locus génomique humain
+unique et non ambigu (*MIR208A*, *MIR208B*, *MIR499A* -- *miR-1*, *miR-133a* et *let-7a*
+existant en plusieurs copies paralogues chez l'humain, un croisement à gène Ensembl
+unique serait arbitraire pour ces trois-là), l'orthologie annotée par Ensembl Compara
+confirme la conservation observée :
+
+```{r compara}
+compara_file <- "../results/compara_orthology_crosscheck.tsv"
+if (file.exists(compara_file)) {
+  read_tsv(compara_file, show_col_types = FALSE) %>%
+    kable(format = "html",
+          col.names = c("Famille", "Gène Ensembl", "Espèce cible", "Type d'homologie",
+                         "Identité (niveau gène, %)", "Niveau taxonomique"))
+}
+```
+
+*MIR208A* a un orthologue confirmé (`ortholog_one2one`) jusque chez le poisson-zèbre --
+plus large que ce que suggérait l'extraction miRBase seule (aucune séquence mature
+zebrafish n'y était annotée pour ce miARN), signe que les deux bases de données ne sont
+pas parfaitement synchronisées. **Aucun orthologue Compara n'est trouvé pour *MIR499A*
+chez la souris, le rat, le poulet ou le poisson-zèbre** -- ceci corrobore, de façon
+indépendante, l'absence déjà constatée dans miRBase (voir section précédente), et
+renforce l'hypothèse d'une réelle limite de détection plutôt que d'une simple lacune
+isolée d'une seule base.
 
 ## Choix méthodologique : identité de séquence plutôt que dN/dS
 
@@ -117,14 +169,12 @@ non codantes courtes.
   "Autre" des lignées non subdivisées plus finement (reptiles, invertébrés hors
   Insecta/Nematoda, tuniciers...) -- suffisant pour cette analyse mais pas une taxonomie
   complète.
+- Le croisement Ensembl Compara ne couvre que 3 des 6 familles (locus génomique humain
+  unique requis) et seulement 4 espèces cibles (souris, rat, poulet, poisson-zèbre) --
+  pas une confirmation d'orthologie exhaustive sur l'ensemble du panel.
 
 ## Reproductibilité
 
 ```bash
-python3 scripts/00_extract_sequences.py
-python3 scripts/01_fetch_taxonomy.py
-python3 scripts/02_align_and_score.py
-python3 scripts/03_propose_model.py
-docker run --rm --user "$(id -u):$(id -g)" -v "$(pwd):/proj" -w /proj/scripts rocker/tidyverse:4.3.1 \
-  Rscript -e "rmarkdown::render('04_report.Rmd')"
+./scripts/run_all.sh
 ```

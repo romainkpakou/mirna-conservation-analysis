@@ -93,3 +93,34 @@ fichier de la famille. Un repli automatique (`find_human_paralog_variant` dans
 - [x] Alignement MAFFT + score de conservation (identité vs humain)
 - [x] Recommandation de modèle animal par famille
 - [x] Rapport final
+
+## Améliorations post-livraison (2026-09-17)
+
+Trois améliorations apportées après une relecture critique du projet terminé :
+
+1. **Conservation de la seed region** (positions 2-8 de la séquence mature,
+   `scripts/02_align_and_score.py`) : calculée séparément de l'identité globale. Résultat
+   réel : la seed est systématiquement plus conservée (99,4-100 %) que la séquence
+   entière (95,0-99,8 %) sur les 6 familles — cohérent avec la pression de sélection plus
+   forte sur le segment déterminant pour la reconnaissance des cibles.
+2. **Croisement Ensembl Compara** (`scripts/04_compara_crosscheck.py`) : comble un écart
+   entre le plan initial (qui prévoyait Ensembl Compara) et la première implémentation
+   (purement basée sur l'identité de séquence miRBase). Limité aux 3 miARN à locus
+   génomique humain unique (*MIR208A*, *MIR208B*, *MIR499A*) — *miR-1*, *miR-133a* et
+   *let-7a* ont plusieurs loci paralogues chez l'humain, un choix de gène "canonique"
+   serait arbitraire pour ces trois-là, non traité plutôt que tranché arbitrairement.
+   Résultat notable : confirme indépendamment l'absence d'orthologue pour *MIR499A* chez
+   les modèles de laboratoire courants (0/4 espèces cibles), déjà constatée via miRBase.
+3. **`scripts/run_all.sh`** : orchestration de bout en bout, cohérent avec les autres
+   dépôts de la série.
+
+### Statut
+
+- [x] Seed region implémentée et vérifiée (résultat biologiquement cohérent)
+- [x] Croisement Compara implémenté pour les 3 miARN à locus unique
+- [x] `run_all.sh` testé de bout en bout
+- [ ] TargetScan (mentionné au plan initial, toujours non utilisé) — les deux autres
+      sources de données du plan (miRBase, Ensembl Compara) couvrent déjà l'essentiel du
+      besoin ; TargetScan resterait pertinent pour une analyse de conservation des sites
+      cibles dans les 3'UTR, hors du périmètre actuel (conservation de la séquence du
+      miARN lui-même)

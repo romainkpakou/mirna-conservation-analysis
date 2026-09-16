@@ -1,24 +1,24 @@
-species_code	species_full	clade	pct_identity_vs_human	positions_comparees
-mmu	Mus musculus	Mammalia	100.0	22
-hsa	Homo sapiens	Mammalia	100.0	22
-mml	Macaca mulatta	Mammalia	100.0	22
-ptr	Pan troglodytes	Mammalia	100.0	22
-bta	Bos taurus	Mammalia	100.0	22
-cfa	Canis lupus familiaris	Mammalia	100.0	22
-eca	Equus caballus	Mammalia	100.0	22
-ssc	Sus scrofa	Mammalia	100.0	22
-ppy	Pongo pygmaeus	Mammalia	100.0	22
-rno	Rattus norvegicus	Mammalia	100.0	22
-mdo	Monodelphis domestica	Mammalia	100.0	22
-chi	Capra hircus	Mammalia	100.0	21
-cja	Callithrix jacchus	Mammalia	100.0	22
-pal	Pteropus alecto	Mammalia	100.0	20
-cpo	Cavia porcellus	Mammalia	100.0	22
-dno	Dasypus novemcinctus	Mammalia	100.0	22
-ocu	Oryctolagus cuniculus	Mammalia	100.0	22
-laf	Loxodonta africana	Mammalia	100.0	22
-pae	Pongo abelii	Mammalia	100.0	22
-lch	Latimeria chalumnae	Autre	86.4	22
-sha	Sarcophilus harrisii	Mammalia	86.4	22
-ete	Echinops telfairi	Mammalia	86.4	22
-pma	Petromyzon marinus	Autre	72.7	22
+species_code	species_full	clade	pct_identity_vs_human	pct_identity_seed_vs_human	positions_comparees
+mmu	Mus musculus	Mammalia	100.0	100.0	22
+hsa	Homo sapiens	Mammalia	100.0	100.0	22
+mml	Macaca mulatta	Mammalia	100.0	100.0	22
+ptr	Pan troglodytes	Mammalia	100.0	100.0	22
+bta	Bos taurus	Mammalia	100.0	100.0	22
+cfa	Canis lupus familiaris	Mammalia	100.0	100.0	22
+eca	Equus caballus	Mammalia	100.0	100.0	22
+ssc	Sus scrofa	Mammalia	100.0	100.0	22
+ppy	Pongo pygmaeus	Mammalia	100.0	100.0	22
+rno	Rattus norvegicus	Mammalia	100.0	100.0	22
+mdo	Monodelphis domestica	Mammalia	100.0	100.0	22
+chi	Capra hircus	Mammalia	100.0	100.0	21
+cja	Callithrix jacchus	Mammalia	100.0	100.0	22
+pal	Pteropus alecto	Mammalia	100.0	100.0	20
+cpo	Cavia porcellus	Mammalia	100.0	100.0	22
+dno	Dasypus novemcinctus	Mammalia	100.0	100.0	22
+ocu	Oryctolagus cuniculus	Mammalia	100.0	100.0	22
+laf	Loxodonta africana	Mammalia	100.0	100.0	22
+pae	Pongo abelii	Mammalia	100.0	100.0	22
+lch	Latimeria chalumnae	Autre	86.4	100.0	22
+sha	Sarcophilus harrisii	Mammalia	86.4	100.0	22
+ete	Echinops telfairi	Mammalia	86.4	100.0	22
+pma	Petromyzon marinus	Autre	72.7	100.0	22
