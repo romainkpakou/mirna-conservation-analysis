@@ -1,0 +1,7 @@
+species_code	species_full	clade	pct_identity_vs_human	positions_comparees
+hsa	Homo sapiens	Mammalia	100.0	22
+ggo	Gorilla gorilla	Mammalia	100.0	20
+tch	Tupaia chinensis	NA	100.0	22
+cja	Callithrix jacchus	Mammalia	100.0	22
+pal	Pteropus alecto	Mammalia	100.0	21
+ssa	Salmo salar	Actinopterygii	95.5	22

@@ -1,0 +1,8 @@
+# Fichiers miRBase bruts (re-téléchargeables, plusieurs Mo)
+data/mature.fa
+data/hairpin.fa
+
+*.tmp
+*.log
+__pycache__/
+.DS_Store

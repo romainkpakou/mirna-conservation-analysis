@@ -1,0 +1,7 @@
+famille	n_modeles_disponibles	modele_recommande	identite_pct	alternatives
+let-7a-5p	5	Souris (Mus musculus)	100.0	Rat (Rattus norvegicus) (100.0%), Poulet (Gallus gallus) (100.0%), Poisson-zèbre (Danio rerio) (100.0%)
+miR-1-3p	4	Nématode (Caenorhabditis elegans)	100.0	Poisson-zèbre (Danio rerio) (100.0%), Rat (Rattus norvegicus) (95.5%), Drosophile (Drosophila melanogaster) (90.9%)
+miR-133a-3p	4	Souris (Mus musculus)	100.0	Poulet (Gallus gallus) (100.0%), Poisson-zèbre (Danio rerio) (100.0%), Xénope (Xenopus tropicalis) (100.0%)
+miR-208a-3p	2	Souris (Mus musculus)	100.0	Rat (Rattus norvegicus) (100.0%)
+miR-208b-3p	2	Souris (Mus musculus)	100.0	Rat (Rattus norvegicus) (100.0%)
+miR-499a-5p	0	Aucun modèle de laboratoire courant disponible	NA	

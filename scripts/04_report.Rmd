@@ -1,0 +1,130 @@
+---
+title: "Conservation inter-espèces de microARN et choix de modèle animal"
+subtitle: "myomiRs cardiaques/musculaires (miR-1, miR-133a, miR-208a/b, miR-499a) et let-7a"
+author: "Romain KPAKOU"
+date: "`r format(Sys.Date(), '%d %B %Y')`"
+output:
+  html_document:
+    theme: flatly
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+library(tidyverse)
+library(knitr)
+```
+
+<style>
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th, td { border: 1px solid #ddd; padding: 6px 10px; text-align: left; }
+th { background-color: #2A2A2A; color: #F0EBE0; }
+tr:nth-child(even) { background-color: #f7f5f2; }
+</style>
+
+## Contexte
+
+Étude de la conservation inter-espèces d'un panel de microARN musculaires/cardiaques
+("myomiRs") -- *miR-1*, *miR-133a*, *miR-208a*, *miR-208b*, *miR-499a* -- et de *let-7a*
+comme référence de conservation profonde. Panel choisi pour sa cohérence avec les
+projets précédents de cette série centrés sur la génomique cardiaque
+(*MYH7* dans le panel CNV, RNA-seq cardiaque ENCODE) : *miR-208a* et *miR-208b* sont
+respectivement nichés dans un intron des gènes *MYH6* et *MYH7*. Voir
+[README](../README.md) et [PLAN.md](../PLAN.md) pour la méthodologie complète.
+
+Pipeline entièrement automatisé et paramétré par liste de miARN
+(`scripts/00_extract_sequences.py`) -- reproductible pour tout autre miARN présent dans
+miRBase sans modification du code.
+
+## Étendue de la conservation par famille
+
+```{r summary}
+read_tsv("../results/conservation_summary.tsv", show_col_types = FALSE) %>%
+  kable(format = "html",
+        col.names = c("Famille", "Espèces (miRBase)", "Clades présents", "Identité moyenne vs humain (%)"))
+```
+
+```{r n-species-plot, fig.width=7, fig.height=4}
+read_tsv("../results/conservation_summary.tsv", show_col_types = FALSE) %>%
+  mutate(famille = fct_reorder(famille, n_especes)) %>%
+  ggplot(aes(x = famille, y = n_especes)) +
+  geom_col(fill = "#D4A574") +
+  coord_flip() +
+  labs(x = NULL, y = "Nombre d'espèces avec orthologue annoté (miRBase)",
+       title = "Étendue phylogénétique de la conservation par famille") +
+  theme_minimal(base_size = 12)
+```
+
+*let-7a* et *miR-1* sont détectés jusque chez les nématodes et insectes (conservation
+remontant à l'ancêtre commun des bilatériens, >600 millions d'années) ; *miR-208a/b* et
+*miR-499a* sont restreints aux mammifères -- cohérent avec leur origine évolutive récente,
+nichés dans des gènes de myosine cardiaque apparus avec la complexification du système
+cardiovasculaire des vertébrés.
+
+## Recommandation de modèle animal par miARN
+
+```{r models}
+read_tsv("../results/model_recommendations.tsv", show_col_types = FALSE) %>%
+  kable(format = "html",
+        col.names = c("Famille", "Modèles disponibles", "Modèle recommandé", "Identité (%)", "Alternatives"))
+```
+
+La souris est recommandée pour 4 des 6 familles (identité 100 % sur la séquence mature).
+Pour *miR-1*, le nématode *C. elegans* et le poisson-zèbre sont à égalité parfaite
+(100 %) -- un exemple frappant de conservation de séquence sur des centaines de millions
+d'années d'évolution.
+
+**Cas particulier : *miR-499a-5p*.** Aucun modèle de laboratoire standard (souris, rat,
+poisson-zèbre, poulet) n'est annoté dans miRBase pour ce miARN, alors que le gène *MYH7B*
+qui l'héberge existe bien chez la souris. Il s'agit très probablement d'une **lacune
+d'annotation de miRBase** plutôt que d'une absence biologique réelle -- un point de
+vigilance à ne pas confondre avec une conclusion de conservation (absence de preuve
+n'est pas preuve d'absence).
+
+## Détail : conservation de *miR-1-3p*
+
+```{r mir1-table}
+read_tsv("../results/conservation_miR-1-3p.tsv", show_col_types = FALSE) %>%
+  arrange(desc(pct_identity_vs_human)) %>%
+  slice_head(n = 15) %>%
+  kable(format = "html",
+        col.names = c("Code espèce", "Espèce", "Clade", "Identité vs humain (%)", "Positions comparées"))
+```
+
+Note méthodologique : *miR-1* existe en deux copies génomiques chez l'humain
+(*MIR1-1*/*MIR1-2*) ; miRBase annote le produit mature sous un nom incluant le numéro de
+locus (`hsa-miR-1-2-3p`) plutôt que le nom de famille simple. Ce cas a été détecté et
+géré automatiquement par le pipeline (voir `scripts/00_extract_sequences.py`).
+
+## Choix méthodologique : identité de séquence plutôt que dN/dS
+
+Le plan initial envisageait un score de pression de sélection type dN/dS. Les microARN
+matures étant des ARN **non codants**, la distinction substitutions synonymes/non-
+synonymes ne s'applique pas à leur séquence. Le score retenu est l'**identité de
+séquence par rapport à l'orthologue humain**, calculée sur l'alignement multiple MAFFT
+(colonnes sans gap uniquement) -- la mesure standard et appropriée pour des séquences
+non codantes courtes.
+
+## Limites
+
+- Séquences matures très courtes (20-23 nt) : chaque substitution représente 4-5 points
+  de pourcentage d'identité, la mesure est donc grossière à cette échelle.
+- L'absence d'un orthologue dans miRBase pour une espèce donnée peut refléter une lacune
+  d'annotation plutôt qu'une absence biologique réelle (cas de *miR-499a-5p* chez la
+  souris, voir ci-dessus).
+- La classification taxonomique par grand clade (via NCBI Taxonomy) regroupe sous
+  "Autre" des lignées non subdivisées plus finement (reptiles, invertébrés hors
+  Insecta/Nematoda, tuniciers...) -- suffisant pour cette analyse mais pas une taxonomie
+  complète.
+
+## Reproductibilité
+
+```bash
+python3 scripts/00_extract_sequences.py
+python3 scripts/01_fetch_taxonomy.py
+python3 scripts/02_align_and_score.py
+python3 scripts/03_propose_model.py
+docker run --rm --user "$(id -u):$(id -g)" -v "$(pwd):/proj" -w /proj/scripts rocker/tidyverse:4.3.1 \
+  Rscript -e "rmarkdown::render('04_report.Rmd')"
+```
